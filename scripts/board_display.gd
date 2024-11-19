@@ -43,7 +43,7 @@ func setup() -> void:
 			
 			var icon := TextureButton.new()
 			icon.z_index = 1
-			icon.stretch_mode = 6
+			icon.stretch_mode = 5
 			add_child(icon)
 			display_board.append(icon)
 
@@ -52,7 +52,7 @@ func setup() -> void:
 func update() -> void:
 	board_position = Vector2(
 			(get_viewport_rect().size.y - 8 * board_scale) / 2, 
-			(get_viewport_rect().size.y - 8 * board_scale) / 2)
+			(get_viewport_rect().size.x - 8 * board_scale) / 2)
 	# Skip if either are empty to avoid bad accesses
 	if (display_board.size() == 0 or display_tiles.size() == 0):
 		return

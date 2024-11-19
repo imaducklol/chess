@@ -22,12 +22,21 @@ enum Team {
 var type: Type = 0
 var team: Team = 0
 var has_moved: bool = false
+# Used only for en passant, I don't like this but it works
+var just_double_moved: bool = false
 
 #func get_team(piece: int) -> Team:
 	#return piece & 0b011000
 
 ## Returns true if Piece is on the same team as other
-func is_ally(other: Piece) -> bool:
+func is_ally_of(other: Piece) -> bool:
 	return team == other.team
-#func is_ally(piece: int, other: int) -> bool:
-	#return get_team(piece) == get_team(other)
+
+## Returns true if Piece is on the opposite team as other
+func is_enemy_of(other: Piece) -> bool:
+	return ((team == Team.WHITE and other.team == Team.BLACK) or 
+			(team == Team.BLACK and other.team == Team.WHITE))
+
+## Returns true if Piece is the none piece
+func is_none() -> bool:
+	return (team == Team.NONE and type == Type.NONE)
