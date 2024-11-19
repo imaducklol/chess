@@ -4,20 +4,20 @@ extends Node
 
 ## Enum for the type of the piece, NONE is used for blank tiles
 enum Type {
-	NONE, 
-	PAWN, 
-	KING, 
-	QUEEN, 
-	BISHOP, 
-	KNIGHT, 
-	ROOK,
+	NONE 	= 0,
+	PAWN 	= 1,  
+	KING 	= 2,  
+	QUEEN 	= 3,  
+	BISHOP 	= 4,  
+	KNIGHT 	= 5,  
+	ROOK 	= 6,
 }
 
 ## Enum for the team of the piece, NONE is used for blank tiles
 enum Team {
-	WHITE, 
-	BLACK, 
-	NONE,
+	NONE 	= 0,
+	WHITE 	= 8,
+	BLACK 	= 16,
 }
 
 ## Type of the piece
