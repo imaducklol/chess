@@ -1,16 +1,17 @@
 class_name Board
+extends Node
 
 ## The chess board
-var board = [8][8]
+var board: Array = [8][8]
 
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(delta: float) -> void:
 	pass
 
 func startingPosition() -> void:
@@ -31,5 +32,5 @@ func startingPosition() -> void:
 		for j in range(0, 8):
 			match template[i][j]:
 				0:
-					board[i][j] = new 
+					board[i][j] = 0
 				
