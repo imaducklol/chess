@@ -1,4 +1,3 @@
-## Abstract parent class for pieces
 class_name Piece
 extends Node
 
@@ -20,12 +19,15 @@ enum Team {
 	BLACK 	= 16,
 }
 
-func get_team(piece: int) -> Team:
-	return piece & 0b11000
+var type: Type = 0
+var team: Team = 0
+var has_moved: bool = false
+
+#func get_team(piece: int) -> Team:
+	#return piece & 0b011000
 
 ## Returns true if Piece is on the same team as other
-func is_ally(piece: int, other: int) -> bool:
-	return get_team(piece) == get_team(other)
-
-func valid_moves(piece: int, position: Vector2, board: Array) -> Array:
-	return []
+func is_ally(other: Piece) -> bool:
+	return team == other.team
+#func is_ally(piece: int, other: int) -> bool:
+	#return get_team(piece) == get_team(other)

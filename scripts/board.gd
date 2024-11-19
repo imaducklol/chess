@@ -2,7 +2,7 @@ class_name Board
 extends Node2D
 
 ## The chess board
-var board: Array[int] = [64]
+var board: Array[Piece] = []
 
 signal board_updated
 
@@ -14,3 +14,9 @@ func _ready() -> void:
 	
 	board_helper.initialize_board(board)
 	board_helper.load_from_fen(board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
+
+
+func get_moves(position: int) -> Array[int]:
+	var piece := board[position]
+	
+	return []

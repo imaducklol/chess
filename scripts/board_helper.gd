@@ -1,47 +1,36 @@
 class_name BoardHelper
 
-func initialize_board(board: Array[int]) -> void:
+func initialize_board(board: Array[Piece]) -> void:
 	for i in range(0, 8):
 		for j in range(0, 8):
-			board.append(0)
+			board.append(Piece.new())
 
-func load_from_fen(board: Array[int], fen: String, board_updated: Signal) -> void:
+func load_from_fen(board: Array[Piece], fen: String, board_updated: Signal) -> void:
 	var segments := fen.split(" ")
 	var rows := segments[0].split("/")
 	for i in range(0, 8):
 		var j := 0
 		for letter in rows[i]:
-			var ascii: int = letter.unicode_at(0) - "0".unicode_at(0)
-			if 0 <= ascii and ascii <= 9:
-				for k in range(0, ascii):
-					board[i*8 + j] = 0
+			if letter.is_valid_int():
+				for k in range(0, int(letter)):
+					board[i*8 + j] = Piece.new()
 					j += 1
 				continue
-			
-			match letter:
+			var piece := Piece.new()
+			piece.team = Piece.Team.WHITE if letter == letter.to_upper() else Piece.Team.BLACK
+			match letter.to_lower():
 				"p":
-					board[i*8 + j] = Piece.Team.BLACK | Piece.Type.PAWN
+					piece.type = Piece.Type.PAWN
 				"k":
-					board[i*8 + j] = Piece.Team.BLACK | Piece.Type.KING
+					piece.type = Piece.Type.KING
 				"q":
-					board[i*8 + j] = Piece.Team.BLACK | Piece.Type.QUEEN
+					piece.type = Piece.Type.QUEEN
 				"b":
-					board[i*8 + j] = Piece.Team.BLACK | Piece.Type.BISHOP
+					piece.type = Piece.Type.BISHOP
 				"n":
-					board[i*8 + j] = Piece.Team.BLACK | Piece.Type.KNIGHT
+					piece.type = Piece.Type.KNIGHT
 				"r":
-					board[i*8 + j] = Piece.Team.BLACK | Piece.Type.ROOK
-				"P":
-					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.PAWN
-				"K":
-					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.KING
-				"Q":
-					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.QUEEN
-				"B":
-					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.BISHOP
-				"N":
-					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.KNIGHT
-				"R":
-					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.ROOK
+					piece.type = Piece.Type.ROOK
+			board[i*8 + j] = piece
 			j += 1
 	board_updated.emit()
