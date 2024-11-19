@@ -20,14 +20,12 @@ enum Team {
 	BLACK 	= 16,
 }
 
-## Type of the piece
-var type := Type.NONE
-## Team of the piece
-var team := Team.NONE
+func get_team(piece: int) -> Team:
+	return piece & 0b11000
 
 ## Returns true if Piece is on the same team as other
-func is_ally(other: Piece) -> bool:
-	return team == other.team
+func is_ally(piece: int, other: int) -> bool:
+	return get_team(piece) == get_team(other)
 
-func valid_moves(board: Array) -> Array:
+func valid_moves(piece: int, position: Vector2, board: Array) -> Array:
 	return []

@@ -18,7 +18,6 @@ func startingPosition() -> void:
 
 func load_from_fen(fen: String) -> void:
 	var segments := fen.split(" ")
-	print(segments)
 	var rows := segments[0].split("/")
 	for i in range(0, 8):
 		var j := 0
@@ -57,4 +56,3 @@ func load_from_fen(fen: String) -> void:
 					board[i*8 + j] = Piece.Team.WHITE | Piece.Type.ROOK
 			j += 1
 	board_updated.emit()
-	print(board)
