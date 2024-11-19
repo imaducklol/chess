@@ -9,3 +9,4 @@ script = ExtResource("1_86vox")
 dark_tile = Color(0.745098, 0.560784, 0.407843, 1)
 light_tile = Color(0.941176, 0.85098, 0.709804, 1)
 button_scale = 30.0
+board_position = Vector2(50, -30)
