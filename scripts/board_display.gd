@@ -69,10 +69,12 @@ func update() -> void:
 			tile.color = light_tile if (i + j) % 2 == 0 else dark_tile
 
 			var button: TextureButton = display_board[i*8 + j]
+			button.scale = (Vector2(1/button_scale, 1/button_scale))
 			button.set_position(Vector2(rotated_i*board_scale, rotated_j*board_scale) + board_position)
 			
 			var piece := GlobalBoard.board[i*8 + j]
 			var file_string: String = ""
+			var icon: Texture2D
 			match piece.team:
 				Piece.Team.WHITE:
 					file_string += "w"
@@ -92,7 +94,8 @@ func update() -> void:
 				Piece.Type.ROOK:
 					file_string += "R"
 				_:
-					file_string = "broken.png"
-			var icon: Texture2D = load(image_directory+file_string+".svg")
+					icon = null
+					button.texture_normal = icon
+					continue
+			icon = load(image_directory+file_string+".svg")
 			button.texture_normal = icon
-			button.scale = (Vector2(1/button_scale, 1/button_scale))
