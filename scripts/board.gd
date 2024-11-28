@@ -16,6 +16,9 @@ func _ready() -> void:
 	board_helper.load_from_fen(board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
 	board_helper.load_from_fen(board, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
 
+func move(src: int, dest: int) -> void:
+	board[dest] = board[src]
+	board[src] = Piece.new()
 
 func get_moves(pos: int) -> Array[int]:
 	var piece := board[pos]

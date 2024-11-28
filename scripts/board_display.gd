@@ -23,11 +23,25 @@ var board_position: Vector2
 var display_tiles: Array[ColorRect] = []
 var display_board: Array[TextureButton] = []
 
+var selected_piece: int = -1
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	setup()
 	update()
 	GlobalBoard.board_updated.connect(update)
+
+func on_button_press(button: ScriptButton):
+	print(button.board_position)
+	if (selected_piece == -1):
+		selected_piece = button.board_position
+		return
+	else:
+		GlobalBoard.move(selected_piece, button.board_position)
+		selected_piece = -1
+		update()
+		return
+	
 
 ## Setup the board and tiles
 func setup() -> void:
@@ -41,9 +55,12 @@ func setup() -> void:
 			add_child(tile)
 			display_tiles.append(tile)
 			
-			var icon := TextureButton.new()
+			var icon := ScriptButton.new()
+			icon.board_position = i*8 + j
+			icon.pressed.connect(on_button_press.bind(icon))
 			icon.z_index = 1
-			icon.stretch_mode = 5
+			icon.stretch_mode = 0
+			icon.ignore_texture_size = true
 			add_child(icon)
 			display_board.append(icon)
 
@@ -69,7 +86,7 @@ func update() -> void:
 			tile.color = light_tile if (i + j) % 2 == 0 else dark_tile
 
 			var button: TextureButton = display_board[i*8 + j]
-			button.scale = (Vector2(1/button_scale, 1/button_scale))
+			button.size = (Vector2(board_scale, board_scale))
 			button.set_position(Vector2(rotated_i*board_scale, rotated_j*board_scale) + board_position)
 			
 			var piece := GlobalBoard.board[i*8 + j]
