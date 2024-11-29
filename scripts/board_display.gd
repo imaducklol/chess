@@ -22,8 +22,10 @@ var board_position: Vector2
 
 var display_tiles: Array[ColorRect] = []
 var display_board: Array[TextureButton] = []
+var highlighted:   Array[ColorRect] = []
 
 var selected_piece: int = -1
+var selected_piece_moves: Array[int]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -32,15 +34,43 @@ func _ready() -> void:
 	GlobalBoard.board_updated.connect(update)
 
 func on_button_press(button: ScriptButton):
-	print(button.board_position)
+	var pos = button.board_position
+	# First selection
 	if (selected_piece == -1):
-		selected_piece = button.board_position
+		# Don't select a none piece
+		if (GlobalBoard.board[pos].type == Piece.Type.NONE):
+			return
+		selected_piece = pos
+		selected_piece_moves = GlobalBoard.get_moves(pos)
+		#highlight(pos)
+		for h_pos: int in selected_piece_moves:
+			highlight(h_pos)
+		for texture_b in display_board:
+			texture_b.move_to_front()
 		return
+	# Second selection
 	else:
-		GlobalBoard.move(selected_piece, button.board_position)
+		if pos in selected_piece_moves:
+			GlobalBoard.move(selected_piece, pos)
 		selected_piece = -1
+		selected_piece_moves.clear()
+		for tile in highlighted:
+			tile.queue_free()
+		highlighted.clear()
 		update()
 		return
+	
+func highlight(position: int):
+	var x := position % 8
+	var y := position / 8
+	
+	var tile = ColorRect.new()
+	tile.z_index = 0
+	tile.set_size(Vector2(board_scale, board_scale))
+	tile.set_position(Vector2(x*board_scale, y*board_scale) + board_position)
+	tile.color = Color(255, 0, 0, .5)
+	add_child(tile)
+	highlighted.append(tile)
 	
 
 ## Setup the board and tiles
@@ -51,7 +81,7 @@ func setup() -> void:
 	for i in range(0, 8):
 		for j in range (0, 8):
 			var tile := ColorRect.new()
-			tile.z_index = 0
+			tile.z_index = -1
 			add_child(tile)
 			display_tiles.append(tile)
 			

@@ -17,7 +17,7 @@ func load_from_fen(board: Array[Piece], fen: String, board_updated: Signal) -> v
 					j += 1
 				continue
 			var piece := Piece.new()
-			piece.team = Piece.Team.WHITE if letter == letter.to_upper() else Piece.Team.BLACK
+			piece.team = Piece.Team.BLACK if letter == letter.to_upper() else Piece.Team.WHITE
 			match letter.to_lower():
 				"p":
 					piece.type = Piece.Type.PAWN
