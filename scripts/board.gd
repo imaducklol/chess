@@ -3,6 +3,7 @@ extends Node2D
 
 ## The chess board
 var board: Array[Piece] = []
+var turn: bool
 
 signal board_updated
 
@@ -13,9 +14,9 @@ func _ready() -> void:
 	board_helper = BoardHelper.new()
 	
 	board_helper.initialize_board(board)
-	board_helper.load_from_fen(board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
-	#board_helper.load_from_fen(board, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
-	#board_helper.load_from_fen(board, "8/8/8/4Q3/8/8/8/8 w KQkq c6 0 2", board_updated)
+	board_helper.load_from_fen(board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
+	#board_helper.load_from_fen(board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
+	#board_helper.load_from_fen(board, turn, "8/8/8/4Q3/8/8/8/8 w KQkq c6 0 2", board_updated)
 
 func move(src: int, dest: int) -> void:
 	var piece := board[src]
@@ -120,10 +121,11 @@ func king_moves(piece: Piece, pos: int) -> Array[int]:
 
 func straight_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
-	var row = pos / 8
-	var column = pos % 8
+	@warning_ignore("integer_division")
+	var row: int = pos / 8
+	var column: int = pos % 8
 	for i in range(-1, -8, -1):
-		var dest = pos + 8*i
+		var dest := pos + 8*i
 		if pos_is_none(dest) and dest % 8 == column:
 			moves.append(dest)
 		elif pos_is_enemy_of(piece, dest):
@@ -131,7 +133,7 @@ func straight_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		else: break
 	for i in range(1, 8):
-		var dest = pos + 8*i
+		var dest := pos + 8*i
 		if pos_is_none(dest) and dest % 8 == column:
 			moves.append(dest)
 		elif pos_is_enemy_of(piece, dest):
@@ -139,7 +141,8 @@ func straight_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		else: break
 	for i in range(-1, -8, -1):
-		var dest = pos + i
+		var dest := pos + i
+		@warning_ignore("integer_division")
 		if pos_is_none(dest) and dest / 8 == row:
 			moves.append(dest)
 		elif pos_is_enemy_of(piece, dest):
@@ -147,7 +150,8 @@ func straight_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		else: break
 	for i in range(1, 8):
-		var dest = pos + i
+		var dest := pos + i
+		@warning_ignore("integer_division")
 		if pos_is_none(dest) and dest / 8 == row:
 			moves.append(dest)
 		elif pos_is_enemy_of(piece, dest):
@@ -158,11 +162,14 @@ func straight_moves(piece: Piece, pos: int) -> Array[int]:
 
 func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
+	@warning_ignore("integer_division")
 	var prev:= Vector2(pos % 8, pos / 8)
 	for i in range(-1, -8, -1):
-		var dest = pos + 8*i + i
+		var dest := pos + 8*i + i
+		@warning_ignore("integer_division")
 		if (Vector2(dest % 8, dest / 8) - prev).abs() != Vector2(1, 1):  
 			break
+		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
 		if pos_is_none(dest):
 			moves.append(dest)
@@ -170,11 +177,14 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			moves.append(dest)
 			break
 		else: break
+	@warning_ignore("integer_division")
 	prev = Vector2(pos % 8, pos / 8)
 	for i in range(1, 8):
-		var dest = pos + 8*i + i
+		var dest := pos + 8*i + i
+		@warning_ignore("integer_division")
 		if (Vector2(dest % 8, dest / 8) - prev).abs() != Vector2(1, 1):  
 			break
+		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
 		if pos_is_none(dest):
 			moves.append(dest)
@@ -182,11 +192,14 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			moves.append(dest)
 			break
 		else: break
+	@warning_ignore("integer_division")
 	prev = Vector2(pos % 8, pos / 8)
 	for i in range(-1, -8, -1):
-		var dest = pos - 8*i + i
+		var dest := pos - 8*i + i
+		@warning_ignore("integer_division")
 		if (Vector2(dest % 8, dest / 8) - prev).abs() != Vector2(1, 1):  
 			break
+		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
 		if pos_is_none(dest):
 			moves.append(dest)
@@ -194,11 +207,14 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			moves.append(dest)
 			break
 		else: break
+	@warning_ignore("integer_division")
 	prev = Vector2(pos % 8, pos / 8)
 	for i in range(1, 8):
-		var dest = pos - 8*i + i
+		var dest := pos - 8*i + i
+		@warning_ignore("integer_division")
 		if (Vector2(dest % 8, dest / 8) - prev).abs() != Vector2(1, 1):  
 			break
+		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
 		if pos_is_none(dest):
 			moves.append(dest)

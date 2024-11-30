@@ -33,8 +33,8 @@ func _ready() -> void:
 	update()
 	GlobalBoard.board_updated.connect(update)
 
-func on_button_press(button: ScriptButton):
-	var pos = button.board_position
+func on_button_press(button: ScriptButton) -> void:
+	var pos := button.board_position
 	# First selection
 	if (selected_piece == -1):
 		# Don't select a none piece
@@ -60,11 +60,12 @@ func on_button_press(button: ScriptButton):
 		update()
 		return
 	
-func highlight(position: int):
-	var x := position % 8
-	var y := position / 8
+func highlight(pos: int) -> void:
+	var x := pos % 8
+	@warning_ignore("integer_division")
+	var y := pos / 8
 	
-	var tile = ColorRect.new()
+	var tile := ColorRect.new()
 	tile.z_index = 0
 	tile.set_size(Vector2(board_scale, board_scale))
 	tile.set_position(Vector2(x*board_scale, y*board_scale) + board_position)
@@ -89,7 +90,7 @@ func setup() -> void:
 			icon.board_position = i*8 + j
 			icon.pressed.connect(on_button_press.bind(icon))
 			icon.z_index = 1
-			icon.stretch_mode = 0
+			icon.stretch_mode = TextureButton.STRETCH_SCALE
 			icon.ignore_texture_size = true
 			add_child(icon)
 			display_board.append(icon)

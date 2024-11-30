@@ -19,8 +19,8 @@ enum Team {
 	BLACK 	= 16,
 }
 
-var type: Type = 0
-var team: Team = 0
+var type: Type = Type.NONE
+var team: Team = Team.NONE
 var has_moved: bool = false
 # Used only for en passant, I don't like this but it works
 var just_double_moved: bool = false
