@@ -15,7 +15,7 @@ func _ready() -> void:
 	
 	board_helper.initialize_board(board)
 	board_helper.load_from_fen(board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
-	#board_helper.load_from_fen(board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
+	board_helper.load_from_fen(board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
 	#board_helper.load_from_fen(board, turn, "8/8/8/4Q3/8/8/8/8 w KQkq c6 0 2", board_updated)
 
 func move(src: int, dest: int) -> void:
@@ -33,7 +33,19 @@ func move(src: int, dest: int) -> void:
 			#board[dest + 8] = board[src]
 			#board[src] = Piece.new()
 			#return
-			
+	elif piece.type == Piece.Type.KING:
+		# Castle kingside
+		if dest - src == 3:
+			board[src + 2] = board[src]
+			board[dest - 2] = board[dest]
+			board[src] = Piece.new()
+			board[dest] = Piece.new()
+		else:
+			board[src - 2] = board[src]
+			board[dest + 3] = board[dest]
+			board[src] = Piece.new()
+			board[dest] = Piece.new()
+	
 	piece.has_moved = true
 	
 	board[dest] = board[src]
@@ -110,9 +122,9 @@ func _king_moves(piece: Piece, pos: int) -> Array[int]:
 	var vec_pos := Vector2(pos % 8, pos / 8)
 	for diff: int in [1, 7, 8, 9]:
 		for mult: int in [-1, 1]:
-			var dest = pos + diff * mult
+			var dest := pos + diff * mult
 			@warning_ignore("integer_division")
-			var vec_dest = Vector2(dest % 8, dest / 8)
+			var vec_dest := Vector2(dest % 8, dest / 8)
 			if abs(vec_dest.x - vec_pos.x) > 1 or abs(vec_dest.y - vec_pos.y) > 1 or not _valid_position(dest):
 				continue
 			if not _pos_is_ally_of(piece, dest): moves.append(dest)
@@ -120,10 +132,12 @@ func _king_moves(piece: Piece, pos: int) -> Array[int]:
 	# Castling?!
 	# Array accesses protected by piece.has_moved in most cases (won't work for other game modes)
 	if piece.has_moved: return moves
-	if not board[pos - 2].has_moved and board[pos - 2].type == Piece.Type.ROOK:
-		moves.append(pos - 2)
-	if not board[pos + 2].has_moved and board[pos + 2].type == Piece.Type.ROOK:
-		moves.append(pos + 2)
+	if not board[pos - 4].has_moved and board[pos - 4].type == Piece.Type.ROOK:
+		if board[pos - 1].type == 0 and board[pos - 2].type == 0 and board[pos - 3].type == 0:
+			moves.append(pos - 4)
+	if not board[pos + 3].has_moved and board[pos + 3].type == Piece.Type.ROOK:
+		if board[pos + 1].type == 0 and board[pos + 2].type == 0:
+			moves.append(pos + 3)
 	return moves
 
 func _straight_moves(piece: Piece, pos: int) -> Array[int]:
@@ -244,6 +258,7 @@ func _knight_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
 	for diff: int in [-17, -15, -10, -6, 6, 10, 15, 17]:
 		var dest := pos + diff
+		@warning_ignore("integer_division")
 		if abs(dest % 8 - pos % 8) > 2 or abs(dest / 8 - pos / 8) > 2:
 			continue 
 		if _valid_position(dest) and not _pos_is_ally_of(piece, dest): moves.append(dest) 
