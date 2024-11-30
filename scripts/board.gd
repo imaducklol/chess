@@ -17,6 +17,7 @@ func _ready() -> void:
 	board_helper.load_from_fen(board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
 	#board_helper.load_from_fen(board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
 	#board_helper.load_from_fen(board, turn, "8/8/8/4Q3/8/8/8/8 w KQkq c6 0 2", board_updated)
+	print(turn)
 
 func move(src: int, dest: int) -> void:
 	var piece := board[src]
@@ -38,78 +39,89 @@ func move(src: int, dest: int) -> void:
 	
 	board[dest] = board[src]
 	board[src] = Piece.new()
+	turn = !turn
 
 func get_moves(pos: int) -> Array[int]:
 	var piece := board[pos]
 	
+	print(piece.team, " ", turn)
+	if not (piece.team == Piece.Team.WHITE) == turn:
+		print("skipped")
+		return []
+	
 	match piece.type:
 		Piece.Type.PAWN:
-			return pawn_moves(piece, pos)
+			return _pawn_moves(piece, pos)
 		Piece.Type.KING:
-			return king_moves(piece, pos)
+			return _king_moves(piece, pos)
 		Piece.Type.QUEEN:
-			return queen_moves(piece, pos)
+			return _queen_moves(piece, pos)
 		Piece.Type.BISHOP:
-			return bishop_moves(piece, pos)
+			return _bishop_moves(piece, pos)
 		Piece.Type.KNIGHT:
-			return knight_moves(piece, pos)
+			return _knight_moves(piece, pos)
 		Piece.Type.ROOK:
-			return rook_moves(piece, pos)
+			return _rook_moves(piece, pos)
 	return []
 
-func valid_position(pos: int) -> bool:
+func _valid_position(pos: int) -> bool:
 	return 0 <= pos and pos <= 63
 
-func pos_is_enemy_of(piece: Piece, pos: int) -> bool:
-	if valid_position(pos):
+func _pos_is_enemy_of(piece: Piece, pos: int) -> bool:
+	if _valid_position(pos):
 		return piece.is_enemy_of(board[pos])
 	return false
 
-func pos_is_ally_of(piece: Piece, pos: int) -> bool:
-	if valid_position(pos):
+func _pos_is_ally_of(piece: Piece, pos: int) -> bool:
+	if _valid_position(pos):
 		return piece.is_ally_of(board[pos])
 	return false
 
-func pos_is_none(pos: int) -> bool:
-	if valid_position(pos):
+func _pos_is_none(pos: int) -> bool:
+	if _valid_position(pos):
 		return board[pos].is_none()
 	return false
 
-func pawn_moves(piece: Piece, pos: int) -> Array[int]:
+func _pawn_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
 	if piece.team == Piece.Team.WHITE:
 		# Check for attackable squares
-		if pos_is_enemy_of(piece, pos + 7): moves.append(pos + 7)
-		if pos_is_enemy_of(piece, pos + 9): moves.append(pos + 9)
+		if _pos_is_enemy_of(piece, pos + 7): moves.append(pos + 7)
+		if _pos_is_enemy_of(piece, pos + 9): moves.append(pos + 9)
 		# Forwards!
-		if pos_is_none(pos + 8): moves.append(pos + 8)
+		if _pos_is_none(pos + 8): moves.append(pos + 8)
 		# Double!
-		if pos_is_none(pos + 16) and not piece.has_moved: moves.append(pos + 16)
+		if _pos_is_none(pos + 16) and not piece.has_moved: moves.append(pos + 16)
 	else:
 		# Check for attackable squares
-		if pos_is_enemy_of(piece, pos - 7): moves.append(pos - 7)
-		if pos_is_enemy_of(piece, pos - 9): moves.append(pos - 9)
+		if _pos_is_enemy_of(piece, pos - 7): moves.append(pos - 7)
+		if _pos_is_enemy_of(piece, pos - 9): moves.append(pos - 9)
 		# Forwards!
-		if pos_is_none(pos - 8): moves.append(pos - 8)
+		if _pos_is_none(pos - 8): moves.append(pos - 8)
 		# Double!
-		if pos_is_none(pos - 16) and not piece.has_moved: moves.append(pos - 16)
+		if _pos_is_none(pos - 16) and not piece.has_moved: moves.append(pos - 16)
 	# En Passant - Holy Hell
 	# Second array access is validated by the first function call
 	#if pos_is_enemy_of(piece, pos + 1) and board[pos + 1].just_double_moved: moves.append(pos + 1)
 	#if pos_is_enemy_of(piece, pos - 1) and board[pos - 1].just_double_moved: moves.append(pos - 1)
 	return moves
 
-func king_moves(piece: Piece, pos: int) -> Array[int]:
+func _king_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
 	# Unit circle
-	if not pos_is_ally_of(piece, pos + 7): moves.append(pos + 7)
-	if not pos_is_ally_of(piece, pos + 8): moves.append(pos + 8)
-	if not pos_is_ally_of(piece, pos + 9): moves.append(pos + 9)
-	if not pos_is_ally_of(piece, pos - 1): moves.append(pos - 1)
-	if not pos_is_ally_of(piece, pos + 1): moves.append(pos + 1)
-	if not pos_is_ally_of(piece, pos - 7): moves.append(pos - 7)
-	if not pos_is_ally_of(piece, pos - 8): moves.append(pos - 8)
-	if not pos_is_ally_of(piece, pos - 9): moves.append(pos - 9)
+	@warning_ignore("integer_division")
+	var vec_pos := Vector2(pos % 8, pos / 8)
+	for diff: int in [1, 7, 8, 9]:
+		for mult: int in [-1, 1]:
+			var dest = pos + diff * mult
+			@warning_ignore("integer_division")
+			var vec_dest = Vector2(dest % 8, dest / 8)
+			print(vec_dest)
+			if abs(vec_dest.x - vec_pos.x) > 1 or abs(vec_dest.y - vec_pos.y) > 1 or not _valid_position(dest):
+				print("stinky king")
+				continue
+			if not _pos_is_ally_of(piece, dest): moves.append(dest)
+
 	# Castling?!
 	# Array accesses protected by piece.has_moved in most cases (won't work for other game modes)
 	if piece.has_moved: return moves
@@ -119,48 +131,48 @@ func king_moves(piece: Piece, pos: int) -> Array[int]:
 		moves.append(pos + 2)
 	return moves
 
-func straight_moves(piece: Piece, pos: int) -> Array[int]:
+func _straight_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
 	@warning_ignore("integer_division")
 	var row: int = pos / 8
 	var column: int = pos % 8
 	for i in range(-1, -8, -1):
 		var dest := pos + 8*i
-		if pos_is_none(dest) and dest % 8 == column:
+		if _pos_is_none(dest) and dest % 8 == column:
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
 	for i in range(1, 8):
 		var dest := pos + 8*i
-		if pos_is_none(dest) and dest % 8 == column:
+		if _pos_is_none(dest) and dest % 8 == column:
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
 	for i in range(-1, -8, -1):
 		var dest := pos + i
 		@warning_ignore("integer_division")
-		if pos_is_none(dest) and dest / 8 == row:
+		if _pos_is_none(dest) and dest / 8 == row:
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
 	for i in range(1, 8):
 		var dest := pos + i
 		@warning_ignore("integer_division")
-		if pos_is_none(dest) and dest / 8 == row:
+		if _pos_is_none(dest) and dest / 8 == row:
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
 	return moves
 
-func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
+func _diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
 	@warning_ignore("integer_division")
 	var prev:= Vector2(pos % 8, pos / 8)
@@ -171,9 +183,9 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
-		if pos_is_none(dest):
+		if _pos_is_none(dest):
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
@@ -186,9 +198,9 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
-		if pos_is_none(dest):
+		if _pos_is_none(dest):
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
@@ -201,9 +213,9 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
-		if pos_is_none(dest):
+		if _pos_is_none(dest):
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
@@ -216,26 +228,31 @@ func diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 			break
 		@warning_ignore("integer_division")
 		prev = Vector2(dest % 8, dest / 8)
-		if pos_is_none(dest):
+		if _pos_is_none(dest):
 			moves.append(dest)
-		elif pos_is_enemy_of(piece, dest):
+		elif _pos_is_enemy_of(piece, dest):
 			moves.append(dest)
 			break
 		else: break
 	return moves
 
-func queen_moves(piece: Piece, pos: int) -> Array[int]:
+func _queen_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
-	moves.append_array(straight_moves(piece, pos))
-	moves.append_array(diagonal_moves(piece, pos))
+	moves.append_array(_straight_moves(piece, pos))
+	moves.append_array(_diagonal_moves(piece, pos))
 	return moves
 
-func bishop_moves(piece: Piece, pos: int) -> Array[int]:
-	return diagonal_moves(piece, pos)
+func _bishop_moves(piece: Piece, pos: int) -> Array[int]:
+	return _diagonal_moves(piece, pos)
 
-func knight_moves(piece: Piece, pos: int) -> Array[int]:
+func _knight_moves(piece: Piece, pos: int) -> Array[int]:
 	var moves: Array[int]
+	for diff: int in [-17, -15, -10, -6, 6, 10, 15, 17]:
+		var dest := pos + diff
+		if abs(dest % 8 - pos % 8) > 2 or abs(dest / 8 - pos / 8) > 2:
+			continue 
+		if _valid_position(dest) and not _pos_is_ally_of(piece, dest): moves.append(dest) 
 	return moves
 
-func rook_moves(piece: Piece, pos: int) -> Array[int]:
-	return straight_moves(piece, pos)
+func _rook_moves(piece: Piece, pos: int) -> Array[int]:
+	return _straight_moves(piece, pos)
