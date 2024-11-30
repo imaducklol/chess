@@ -40,9 +40,11 @@ func on_button_press(button: ScriptButton) -> void:
 		# Don't select a none piece
 		if (GlobalBoard.board[pos].type == Piece.Type.NONE):
 			return
-		selected_piece = pos
 		selected_piece_moves = GlobalBoard.get_moves(pos)
-		#highlight(pos)
+		if selected_piece_moves.size() == 0:
+			return
+		selected_piece = pos
+		highlight(pos)
 		for h_pos: int in selected_piece_moves:
 			highlight(h_pos)
 		for texture_b in display_board:

@@ -17,7 +17,6 @@ func _ready() -> void:
 	board_helper.load_from_fen(board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
 	#board_helper.load_from_fen(board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
 	#board_helper.load_from_fen(board, turn, "8/8/8/4Q3/8/8/8/8 w KQkq c6 0 2", board_updated)
-	print(turn)
 
 func move(src: int, dest: int) -> void:
 	var piece := board[src]
@@ -44,9 +43,7 @@ func move(src: int, dest: int) -> void:
 func get_moves(pos: int) -> Array[int]:
 	var piece := board[pos]
 	
-	print(piece.team, " ", turn)
 	if not (piece.team == Piece.Team.WHITE) == turn:
-		print("skipped")
 		return []
 	
 	match piece.type:
@@ -116,9 +113,7 @@ func _king_moves(piece: Piece, pos: int) -> Array[int]:
 			var dest = pos + diff * mult
 			@warning_ignore("integer_division")
 			var vec_dest = Vector2(dest % 8, dest / 8)
-			print(vec_dest)
 			if abs(vec_dest.x - vec_pos.x) > 1 or abs(vec_dest.y - vec_pos.y) > 1 or not _valid_position(dest):
-				print("stinky king")
 				continue
 			if not _pos_is_ally_of(piece, dest): moves.append(dest)
 
