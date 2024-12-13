@@ -5,7 +5,7 @@ func initialize_board(board: Array[Piece]) -> void:
 		for j in range(0, 8):
 			board.append(Piece.new())
 
-func load_from_fen(board: Array[Piece], turn: bool, fen: String, board_updated: Signal) -> void:
+func load_from_fen(board: Array[Piece], turn: bool, fen: String) -> void:
 	var segments := fen.split(" ")
 	var rows := segments[0].split("/")
 	for i in range(0, 8):
@@ -38,4 +38,4 @@ func load_from_fen(board: Array[Piece], turn: bool, fen: String, board_updated: 
 		'w': GlobalBoard.turn = true
 		'b': GlobalBoard.turn = false
 		_: printerr("Error in loading fen: Character `", segments[1], "` not recognized as a team")
-	board_updated.emit()
+	

@@ -27,7 +27,7 @@ func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool
 	if is_maximizing:
 		var max_eval = -INF
 		for move in get_possible_moves(board, Piece.Team.WHITE):
-			var testboard = board.duplicate()
+			var testboard = board.duplicate(true)
 			GlobalBoard.make_move(testboard , move.x, move.y)
 			var eval = minimax(testboard , depth - 1, false, pruning, alpha, beta)
 			max_eval = max(max_eval, eval)
@@ -39,7 +39,7 @@ func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool
 	else:
 		var min_eval = INF
 		for move in get_possible_moves(board, Piece.Team.BLACK):
-			var testboard = board.duplicate()
+			var testboard = board.duplicate(true)
 			GlobalBoard.make_move(testboard , move.x, move.y)
 			var eval = minimax(testboard, depth - 1, true, pruning, alpha, beta)
 			min_eval = min(min_eval, eval)
@@ -54,7 +54,7 @@ func best_move(board: Array[Piece], depth: int, player: Piece.Team, pruning: boo
 	var best_value := -INF if player == Piece.Team.WHITE else INF
 
 	for move in get_possible_moves(board, player):
-		var testboard := board.duplicate()
+		var testboard := board.duplicate(true)
 		GlobalBoard.move(testboard, move.x, move.y)
 		var eval = minimax(testboard, depth - 1, player == Piece.Team.BLACK, pruning, -INF, INF)
 

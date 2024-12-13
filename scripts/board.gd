@@ -19,10 +19,12 @@ func _ready() -> void:
 	minimax = Minimax.new()
 	
 	board_helper.initialize_board(main_board)
-	board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
-	#board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
-	#board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2", board_updated)
-
+	board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	#board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2")
+	#board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2")
+	board_updated.emit()
+	
+	
 func real_move(board: Array[Piece], src: int, dest: int) -> void:
 	move(board, src, dest)
 	print("switching turn")
