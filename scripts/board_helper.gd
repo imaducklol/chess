@@ -35,7 +35,7 @@ func load_from_fen(board: Array[Piece], turn: bool, fen: String, board_updated: 
 			j += 1
 	
 	match segments[1]:
-		'w': GlobalBoard.turn = false
-		'b': GlobalBoard.turn = true
+		'w': GlobalBoard.turn = true
+		'b': GlobalBoard.turn = false
 		_: printerr("Error in loading fen: Character `", segments[1], "` not recognized as a team")
 	board_updated.emit()

@@ -1,10 +1,24 @@
-class_name MiniMax
+class_name Minimax
 
-func run():
-	var moves = get_possible_moves(GlobalBoard.main_board, Piece.Team.BLACK)
-	print(moves)
-	var move = moves.pick_random()
-	GlobalBoard.move(GlobalBoard.main_board, move.x, move.y)
+enum mode {
+	RANDOM,
+	MINIMAX,
+	PRUNED,
+}
+
+func run(team, running_mode: mode, depth:= 5):
+	var move
+	match running_mode:
+		mode.RANDOM:
+			var moves = get_possible_moves(GlobalBoard.main_board, team)
+			#print(moves)
+			move = moves.pick_random()
+		mode.MINIMAX:
+			move = best_move(GlobalBoard.main_board, depth, team, false)
+		mode.PRUNED:
+			move = best_move(GlobalBoard.main_board, depth, team, true)
+	GlobalBoard.real_move(GlobalBoard.main_board, move.x, move.y)
+
 
 func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool, alpha: float, beta: float):
 	if depth == 0:
@@ -15,32 +29,34 @@ func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool
 		for move in get_possible_moves(board, Piece.Team.WHITE):
 			var testboard = board.duplicate()
 			GlobalBoard.make_move(testboard , move.x, move.y)
-			var eval = minimax(testboard , depth - 1, false, false, alpha, beta)
+			var eval = minimax(testboard , depth - 1, false, pruning, alpha, beta)
 			max_eval = max(max_eval, eval)
-			alpha = max(alpha, eval)
-			if beta <= alpha:
-				break
+			if pruning:
+				alpha = max(alpha, eval)
+				if beta <= alpha:
+					break
 		return max_eval
 	else:
 		var min_eval = INF
 		for move in get_possible_moves(board, Piece.Team.BLACK):
 			var testboard = board.duplicate()
 			GlobalBoard.make_move(testboard , move.x, move.y)
-			var eval = minimax(testboard, depth - 1, true, false, alpha, beta)
+			var eval = minimax(testboard, depth - 1, true, pruning, alpha, beta)
 			min_eval = min(min_eval, eval)
-			beta = min(beta, eval)
-			if beta <= alpha:
-				break
+			if pruning:
+				beta = min(beta, eval)
+				if beta <= alpha:
+					break
 		return min_eval
 
-func best_move(board: Array[Piece], depth: int, player: Piece.Team):
-	var best_move = null
-	var best_value = -INF if player == Piece.Team.WHITE else INF
+func best_move(board: Array[Piece], depth: int, player: Piece.Team, pruning: bool) -> Vector2i:
+	var best_move: Vector2i
+	var best_value := -INF if player == Piece.Team.WHITE else INF
 
 	for move in get_possible_moves(board, player):
-		var testboard = board.duplicate()
-		GlobalBoard.make_move(testboard, move, player)
-		var eval = minimax(testboard, depth - 1, player == Piece.Team.BLACK, false, -INF, INF)
+		var testboard := board.duplicate()
+		GlobalBoard.move(testboard, move.x, move.y)
+		var eval = minimax(testboard, depth - 1, player == Piece.Team.BLACK, pruning, -INF, INF)
 
 		if player == Piece.Team.WHITE and eval > best_value:
 			best_value = eval

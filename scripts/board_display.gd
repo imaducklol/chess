@@ -53,9 +53,9 @@ func on_button_press(button: ScriptButton) -> void:
 	# Second selection
 	else:
 		if pos in selected_piece_moves:
-			GlobalBoard.move(GlobalBoard.main_board, selected_piece, pos)
+			GlobalBoard.real_move(GlobalBoard.main_board, selected_piece, pos)
 			clear_highlight_selection()
-			GlobalBoard.minimax.run()
+			GlobalBoard.minimax.run(Piece.Team.BLACK, Minimax.mode.PRUNED, 5)
 			update()
 		else:
 			clear_highlight_selection()

@@ -9,19 +9,25 @@ signal board_updated
 
 var board_helper: BoardHelper
 var move_generation: MoveGeneration
-var minimax: MiniMax
+var minimax: Minimax
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	board_helper = BoardHelper.new()
 	move_generation = MoveGeneration.new(main_board)
-	minimax = MiniMax.new()
+	minimax = Minimax.new()
 	
 	board_helper.initialize_board(main_board)
-	#board_helper.load_from_fen(board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
-	#board_helper.load_from_fen(board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
-	board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2", board_updated)
+	board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board_updated)
+	#board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2", board_updated)
+	#board_helper.load_from_fen(main_board, turn, "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2", board_updated)
+
+func real_move(board: Array[Piece], src: int, dest: int) -> void:
+	move(board, src, dest)
+	print("switching turn")
+	turn = !turn
+	print(minimax.board_eval(board))
 
 func move(board: Array[Piece], src: int, dest: int) -> void:
 	var piece := board[src]
@@ -55,8 +61,7 @@ func move(board: Array[Piece], src: int, dest: int) -> void:
 	
 	board[dest] = board[src]
 	board[src] = Piece.new()
-	turn = !turn
-	print(minimax.board_eval(board))
+	
 
 func get_moves(board: Array[Piece], pos: int) -> Array[int]:
 	var piece := board[pos]
