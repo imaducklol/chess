@@ -2,8 +2,8 @@ class_name MoveGeneration
 
 var board: Array[Piece]
 
-func _init() -> void:
-	board = GlobalBoard.board
+func _init(init_board: Array[Piece]) -> void:
+	board = init_board
 
 func _valid_position(pos: int) -> bool:
 	return 0 <= pos and pos <= 63

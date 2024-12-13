@@ -38,9 +38,9 @@ func on_button_press(button: ScriptButton) -> void:
 	# First selection
 	if (selected_piece == -1):
 		# Don't select a none piece
-		if (GlobalBoard.board[pos].type == Piece.Type.NONE):
+		if (GlobalBoard.main_board[pos].type == Piece.Type.NONE):
 			return
-		selected_piece_moves = GlobalBoard.get_moves(pos)
+		selected_piece_moves = GlobalBoard.get_moves(GlobalBoard.main_board, pos)
 		if selected_piece_moves.size() == 0:
 			return
 		selected_piece = pos
@@ -53,13 +53,12 @@ func on_button_press(button: ScriptButton) -> void:
 	# Second selection
 	else:
 		if pos in selected_piece_moves:
-			GlobalBoard.move(selected_piece, pos)
-		selected_piece = -1
-		selected_piece_moves.clear()
-		for tile in highlighted:
-			tile.queue_free()
-		highlighted.clear()
-		update()
+			GlobalBoard.move(GlobalBoard.main_board, selected_piece, pos)
+			clear_highlight_selection()
+			GlobalBoard.minimax.run()
+			update()
+		else:
+			clear_highlight_selection()
 		return
 	
 func highlight(pos: int) -> void:
@@ -75,6 +74,13 @@ func highlight(pos: int) -> void:
 	add_child(tile)
 	highlighted.append(tile)
 	
+func clear_highlight_selection():
+	selected_piece = -1
+	selected_piece_moves.clear()
+	for tile in highlighted:
+		tile.queue_free()
+	highlighted.clear()
+	update()
 
 ## Setup the board and tiles
 func setup() -> void:
@@ -122,7 +128,7 @@ func update() -> void:
 			button.size = (Vector2(board_scale, board_scale))
 			button.set_position(Vector2(rotated_i*board_scale, rotated_j*board_scale) + board_position)
 			
-			var piece := GlobalBoard.board[i*8 + j]
+			var piece := GlobalBoard.main_board[i*8 + j]
 			var file_string: String = ""
 			var icon: Texture2D
 			match piece.team:
