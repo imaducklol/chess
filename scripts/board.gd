@@ -28,9 +28,7 @@ func _ready() -> void:
 	
 func real_move(board: Array[Piece], src: int, dest: int) -> void:
 	move(board, src, dest)
-	print("switching turn")
 	turn = !turn
-	print(minimax.board_eval(board))
 
 func move(board: Array[Piece], src: int, dest: int) -> void:
 	var piece := board[src]
