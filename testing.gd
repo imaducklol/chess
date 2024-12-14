@@ -28,11 +28,10 @@ func _ready() -> void:
 		
 		# w/ pruning
 		board_helper.load_from_fen(board.main_board, board.turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-		starttime = Time.get_ticks_usec()
+		var prune_starttime = Time.get_ticks_usec()
 		minimax.best_move(board.main_board, i, Piece.Team.WHITE, true)
-		var prune_stoptime = Time.get_ticks_usec() - starttime
+		var prune_stoptime = Time.get_ticks_usec() - prune_starttime
 		var w_runtimes = minimax.runtimes
 		minimax.runtimes = 0
 		
-		print("Depth: ", i)
-		print("Minimax (us): ", stoptime, " ", wo_runtimes, " With Pruning: ", prune_stoptime, " ", w_runtimes)
+		print("Depth: ", i, "\tMinimax (us): ", stoptime, " ", wo_runtimes, " \tWith Pruning: ", prune_stoptime, " ", w_runtimes)
