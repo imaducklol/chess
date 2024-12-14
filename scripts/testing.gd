@@ -7,6 +7,10 @@ var minimax: Minimax
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	run_perf_tests()
+	
+
+func run_perf_tests() -> void:
 	board = Board.new()
 	board_helper = BoardHelper.new()
 	move_generation = MoveGeneration.new(board.main_board)
