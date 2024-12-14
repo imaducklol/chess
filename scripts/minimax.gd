@@ -24,31 +24,29 @@ func run(team, running_mode: mode, depth:= 5):
 
 func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool, alpha: float, beta: float):
 	runtimes += 1
-	if depth == 0 or get_possible_moves(board, Piece.Team.WHITE if is_maximizing else Piece.Team.BLACK).is_empty():
+	if depth == 0: #or get_possible_moves(board, Piece.Team.WHITE if is_maximizing else Piece.Team.BLACK).is_empty():
 		return board_eval(board)
 	if is_maximizing:
 		var max_eval = -INF
 		for move in get_possible_moves(board, Piece.Team.WHITE):
 			var testboard = board.duplicate(true)
-			GlobalBoard.make_move(testboard , move.x, move.y)
+			GlobalBoard.move(testboard , move.x, move.y)
 			var eval = minimax(testboard , depth - 1, false, pruning, alpha, beta)
 			max_eval = max(max_eval, eval)
-			if pruning:
-				alpha = max(alpha, eval)
-				if beta <= alpha:
-					break
+			alpha = max(alpha, eval)
+			if max_eval >= beta:
+				break
 		return max_eval
 	else:
 		var min_eval = INF
 		for move in get_possible_moves(board, Piece.Team.BLACK):
 			var testboard = board.duplicate(true)
-			GlobalBoard.make_move(testboard , move.x, move.y)
+			GlobalBoard.move(testboard , move.x, move.y)
 			var eval = minimax(testboard, depth - 1, true, pruning, alpha, beta)
 			min_eval = min(min_eval, eval)
-			if pruning:
-				beta = min(beta, eval)
-				if beta <= alpha:
-					break
+			beta = min(beta, eval)
+			if min_eval <= alpha:
+				break
 		return min_eval
 
 func best_move(board: Array[Piece], depth: int, player: Piece.Team, pruning: bool) -> Vector2i:
