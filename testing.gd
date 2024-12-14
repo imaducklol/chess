@@ -15,13 +15,19 @@ func _ready() -> void:
 	board_helper.initialize_board(board.main_board)
 	board_helper.load_from_fen(board.main_board, board.turn, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	
-	for i in range(1, 20):
-		var starttime := Time.get_ticks_usec()
-		minimax.best_move(board.main_board, i, Piece.Team.WHITE, false)
-		var stoptime := Time.get_ticks_usec() - starttime
-		starttime = Time.get_ticks_usec()
-		minimax.best_move(board.main_board, i, Piece.Team.WHITE, true)
-		var prune_stoptime = Time.get_ticks_usec() - starttime
-		
-		print("Depth: ", i)
-		print("Minimax (us): ", stoptime, " With Pruning: ", prune_stoptime)
+	print(minimax.get_possible_moves(board.main_board, Piece.Team.BLACK).size())
+
+	#for i in range(1, 20):
+		#var starttime := Time.get_ticks_usec()
+		#minimax.best_move(board.main_board, i, Piece.Team.WHITE, false)
+		#var wo_runtimes = minimax.runtimes
+		#minimax.runtimes = 0
+		#var stoptime := Time.get_ticks_usec() - starttime
+		#starttime = Time.get_ticks_usec()
+		#minimax.best_move(board.main_board, i, Piece.Team.WHITE, true)
+		#var w_runtimes = minimax.runtimes
+		#minimax.runtimes = 0
+		#var prune_stoptime = Time.get_ticks_usec() - starttime
+		#
+		#print("Depth: ", i)
+		#print("Minimax (us): ", stoptime, " ", wo_runtimes, " With Pruning: ", prune_stoptime, " ", w_runtimes)

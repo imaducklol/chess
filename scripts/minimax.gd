@@ -6,6 +6,8 @@ enum mode {
 	PRUNED,
 }
 
+var runtimes = 0
+
 func run(team, running_mode: mode, depth:= 5):
 	var move
 	match running_mode:
@@ -21,9 +23,9 @@ func run(team, running_mode: mode, depth:= 5):
 
 
 func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool, alpha: float, beta: float):
-	if depth == 0:
+	runtimes += 1
+	if depth == 0 or get_possible_moves(board, Piece.Team.WHITE if is_maximizing else Piece.Team.BLACK).is_empty():
 		return board_eval(board)
-
 	if is_maximizing:
 		var max_eval = -INF
 		for move in get_possible_moves(board, Piece.Team.WHITE):
