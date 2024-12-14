@@ -33,9 +33,10 @@ func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool
 			GlobalBoard.move(testboard , move.x, move.y)
 			var eval = minimax(testboard , depth - 1, false, pruning, alpha, beta)
 			max_eval = max(max_eval, eval)
-			alpha = max(alpha, eval)
-			if max_eval >= beta:
-				break
+			if pruning:
+				alpha = max(alpha, eval)
+				if max_eval >= beta:
+					break
 		return max_eval
 	else:
 		var min_eval = INF
@@ -44,9 +45,10 @@ func minimax(board: Array[Piece], depth: int, is_maximizing: bool, pruning: bool
 			GlobalBoard.move(testboard , move.x, move.y)
 			var eval = minimax(testboard, depth - 1, true, pruning, alpha, beta)
 			min_eval = min(min_eval, eval)
-			beta = min(beta, eval)
-			if min_eval <= alpha:
-				break
+			if pruning:
+				beta = min(beta, eval)
+				if min_eval <= alpha:
+					break
 		return min_eval
 
 func best_move(board: Array[Piece], depth: int, player: Piece.Team, pruning: bool) -> Vector2i:
