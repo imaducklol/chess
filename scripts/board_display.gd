@@ -40,7 +40,7 @@ func on_button_press(button: ScriptButton) -> void:
 		# Don't select a none piece
 		if (GlobalBoard.main_board[pos].type == Piece.Type.NONE):
 			return
-		selected_piece_moves = GlobalBoard.get_moves(GlobalBoard.main_board, pos)
+		selected_piece_moves = GlobalBoard.get_moves(GlobalBoard.main_board, pos, GlobalBoard.turn)
 		if selected_piece_moves.size() == 0:
 			return
 		selected_piece = pos

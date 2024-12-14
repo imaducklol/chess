@@ -105,7 +105,7 @@ func get_possible_moves(board: Array[Piece], team: Piece.Team) -> Array[Vector2i
 	for src in range(0, 64):
 		var piece := board[src]
 		if piece.team == team:
-			var piece_moves := GlobalBoard.get_moves(board, src)
+			var piece_moves := GlobalBoard.get_moves(board, src, team == Piece.Team.WHITE )
 			for move in piece_moves:
 				moves.append(Vector2i(src, move))
 	return moves

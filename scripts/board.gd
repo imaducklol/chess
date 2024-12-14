@@ -3,6 +3,7 @@ extends Node2D
 
 ## The chess board
 var main_board: Array[Piece] = []
+## True: White, False: Black
 var turn: bool
 
 signal board_updated
@@ -65,7 +66,7 @@ func move(board: Array[Piece], src: int, dest: int) -> void:
 	board[src] = Piece.new()
 	
 
-func get_moves(board: Array[Piece], pos: int) -> Array[int]:
+func get_moves(board: Array[Piece], pos: int, turn: bool) -> Array[int]:
 	var piece := board[pos]
 	
 	if not (piece.team == Piece.Team.WHITE) == turn:
