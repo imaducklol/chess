@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://boho7orregviy"]
 
-[ext_resource type="Script" path="res://scripts/board_display.gd" id="1_86vox"]
+[ext_resource type="Script" uid="uid://sctw7b7nu7ns" path="res://scripts/board_display.gd" id="1_86vox"]
 
 [node name="Main" type="Node2D"]
 
