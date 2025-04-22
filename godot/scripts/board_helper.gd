@@ -19,19 +19,19 @@ func load_from_fen(board: Array[int], turn: bool, fen: String) -> void:
 			var piece := 0
 			match letter.to_lower():
 				"p":
-					piece = Piece.Type.PAWN
+					piece = Piece.State.PAWN
 				"k":
-					piece = Piece.Type.KING
+					piece = Piece.State.KING
 				"q":
-					piece = Piece.Type.QUEEN
+					piece = Piece.State.QUEEN
 				"b":
-					piece = Piece.Type.BISHOP
+					piece = Piece.State.BISHOP
 				"n":
-					piece = Piece.Type.KNIGHT
+					piece = Piece.State.KNIGHT
 				"r":
-					piece = Piece.Type.ROOK
-			piece *= Piece.Team.BLACK if letter == letter.to_upper() else Piece.Team.WHITE
-			piece |= Piece.HasMoved.TRUE
+					piece = Piece.State.ROOK
+			piece |= 0 if letter == letter.to_upper() else Piece.State.WHITE
+			# Has moved bit not set by default (0)
 			board[i*8 + j] = piece
 			j += 1
 	

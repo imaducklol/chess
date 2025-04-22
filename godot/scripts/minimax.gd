@@ -28,7 +28,7 @@ func minimax(board: Array[int], depth: int, is_maximizing: bool, pruning: bool, 
 		return board_eval(board)
 	if is_maximizing:
 		var max_eval = -INF
-		for move in get_possible_moves(board, Piece.Team.WHITE):
+		for move in get_possible_moves(board, Piece.State.WHITE):
 			var testboard = board.duplicate(true)
 			GlobalBoard.move(testboard , move.x, move.y)
 			var eval = minimax(testboard , depth - 1, false, pruning, alpha, beta)
@@ -40,7 +40,7 @@ func minimax(board: Array[int], depth: int, is_maximizing: bool, pruning: bool, 
 		return max_eval
 	else:
 		var min_eval = INF
-		for move in get_possible_moves(board, Piece.Team.BLACK):
+		for move in get_possible_moves(board, 0):
 			var testboard = board.duplicate(true)
 			GlobalBoard.move(testboard , move.x, move.y)
 			var eval = minimax(testboard, depth - 1, true, pruning, alpha, beta)
@@ -51,19 +51,19 @@ func minimax(board: Array[int], depth: int, is_maximizing: bool, pruning: bool, 
 					break
 		return min_eval
 
-func best_move(board: Array[int], depth: int, player: Piece.Team, pruning: bool) -> Vector2i:
+func best_move(board: Array[int], depth: int, player: Piece.State, pruning: bool) -> Vector2i:
 	var best_move: Vector2i
-	var best_value := -INF if sign(player) == Piece.Team.WHITE else INF
+	var best_value := -INF if player & 0b1000 == Piece.State.WHITE else INF
 
 	for move in get_possible_moves(board, player):
 		var testboard := board.duplicate(true)
 		GlobalBoard.move(testboard, move.x, move.y)
-		var eval = minimax(testboard, depth - 1, player == Piece.Team.BLACK, pruning, -INF, INF)
+		var eval = minimax(testboard, depth - 1, player & 0b1000 == 0, pruning, -INF, INF)
 
-		if player == Piece.Team.WHITE and eval > best_value:
+		if player & 0b1000 == Piece.State.WHITE and eval > best_value:
 			best_value = eval
 			best_move = move
-		elif player == Piece.Team.BLACK and eval < best_value:
+		elif player & 0b1000 == 0 and eval < best_value:
 			best_value = eval
 			best_move = move
 	return best_move
@@ -78,34 +78,34 @@ func pieces_value(board_to_eval: Array[int]) -> float:
 	for i in range(0, 64):
 		var piece_value := 0.0
 		var piece := board_to_eval[i]
-		match abs(piece) & 0b111:
-			Piece.Type.NONE:
+		match piece & 0b111:
+			Piece.State.NONE:
 				continue
-			Piece.Type.PAWN:
+			Piece.State.PAWN:
 				piece_value = 1
-			Piece.Type.KNIGHT:
+			Piece.State.KNIGHT:
 				piece_value = 3
-			Piece.Type.BISHOP:
+			Piece.State.BISHOP:
 				piece_value = 3
-			Piece.Type.ROOK:
+			Piece.State.ROOK:
 				piece_value = 5
-			Piece.Type.QUEEN:
+			Piece.State.QUEEN:
 				piece_value = 9
-			Piece.Type.KING:
+			Piece.State.KING:
 				piece_value = 200
 		
-		if sign(piece) == Piece.Team.BLACK:
+		if piece & 0b1000 == 0:
 			piece_value *= -1
 		
 		value += piece_value
 	return value
 	
-func get_possible_moves(board: Array[int], team: Piece.Team) -> Array[Vector2i]:
+func get_possible_moves(board: Array[int], team: Piece.State) -> Array[Vector2i]:
 	var moves: Array[Vector2i] = []
 	for src in range(0, 64):
 		var piece := board[src]
 		if sign(piece) == team:
-			var piece_moves := GlobalBoard.get_moves(board, src, team == Piece.Team.WHITE )
+			var piece_moves := GlobalBoard.get_moves(board, src, team & 0b1000 == Piece.State.WHITE )
 			for move in piece_moves:
 				moves.append(Vector2i(src, move))
 	return moves

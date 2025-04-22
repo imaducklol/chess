@@ -32,7 +32,7 @@ func real_move(board: Array[int], src: int, dest: int) -> void:
 
 func move(board: Array[int], src: int, dest: int) -> void:
 	var piece := board[src]
-	if piece == Piece.Type.NONE:
+	if piece == Piece.State.NONE:
 		return;
 	#elif abs(piece) & 0b111 == Piece.Type.PAWN:
 		# Double move
@@ -45,7 +45,7 @@ func move(board: Array[int], src: int, dest: int) -> void:
 			#board[dest + 8] = board[src]
 			#board[src] = Piece.new()
 			#return
-	elif abs(piece) & 0b111 == Piece.Type.KING:
+	elif piece & 0b111 == Piece.State.KING:
 		# Castle kingside
 		if dest - src == 3:
 			board[src + 2] = board[src]
@@ -58,7 +58,8 @@ func move(board: Array[int], src: int, dest: int) -> void:
 			board[src] = 0
 			board[dest] = 0
 	
-	piece |= Piece.HasMoved.TRUE
+	# set the MOVED bit
+	piece |= Piece.State.MOVED
 	
 	board[dest] = board[src]
 	board[src] = 0
@@ -67,41 +68,20 @@ func move(board: Array[int], src: int, dest: int) -> void:
 func get_moves(board: Array[int], pos: int, turn: bool) -> Array[int]:
 	var piece := board[pos]
 	
-	if not (sign(piece) == Piece.Team.WHITE) == turn:
+	if not (piece & 0b01000 == Piece.State.WHITE) == turn:
 		return []
 	
-	match abs(piece) & 0b111:
-		Piece.Type.PAWN:
+	match piece & 0b111:
+		Piece.State.PAWN:
 			return move_generation.pawn_moves(piece, pos)
-		Piece.Type.KING:
+		Piece.State.KING:
 			return move_generation.king_moves(piece, pos)
-		Piece.Type.QUEEN:
+		Piece.State.QUEEN:
 			return move_generation.queen_moves(piece, pos)
-		Piece.Type.BISHOP:
+		Piece.State.BISHOP:
 			return move_generation.bishop_moves(piece, pos)
-		Piece.Type.KNIGHT:
+		Piece.State.KNIGHT:
 			return move_generation.knight_moves(piece, pos)
-		Piece.Type.ROOK:
+		Piece.State.ROOK:
 			return move_generation.rook_moves(piece, pos)
 	return []
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	

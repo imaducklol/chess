@@ -38,7 +38,7 @@ func on_button_press(button: ScriptButton) -> void:
 	# First selection
 	if (selected_piece == -1):
 		# Don't select a none piece
-		if (GlobalBoard.main_board[pos] == Piece.Type.NONE):
+		if (GlobalBoard.main_board[pos] == Piece.State.NONE):
 			return
 		selected_piece_moves = GlobalBoard.get_moves(GlobalBoard.main_board, pos, GlobalBoard.turn)
 		if selected_piece_moves.size() == 0:
@@ -55,7 +55,7 @@ func on_button_press(button: ScriptButton) -> void:
 		if pos in selected_piece_moves:
 			GlobalBoard.real_move(GlobalBoard.main_board, selected_piece, pos)
 			clear_highlight_selection()
-			GlobalBoard.minimax.run(Piece.Team.BLACK, Minimax.mode.PRUNED, 5)
+			GlobalBoard.minimax.run(Piece.State.WHITE & 0, Minimax.mode.PRUNED, 5)
 			update()
 		else:
 			clear_highlight_selection()
@@ -131,23 +131,22 @@ func update() -> void:
 			var piece := GlobalBoard.main_board[i*8 + j]
 			var file_string: String = ""
 			var icon: Texture2D
-			match sign(piece):
-				Piece.Team.WHITE:
-					file_string += "w"
-				Piece.Team.BLACK:
-					file_string += "b"
+			if piece & 0b1000 == Piece.State.WHITE:
+				file_string += "w"
+			else:
+				file_string += "b"
 			match abs(piece) & 0b111:
-				Piece.Type.PAWN:
+				Piece.State.PAWN:
 					file_string += "P"
-				Piece.Type.KING:
+				Piece.State.KING:
 					file_string += "K"
-				Piece.Type.QUEEN:
+				Piece.State.QUEEN:
 					file_string += "Q"
-				Piece.Type.BISHOP:
+				Piece.State.BISHOP:
 					file_string += "B"
-				Piece.Type.KNIGHT:
+				Piece.State.KNIGHT:
 					file_string += "N"
-				Piece.Type.ROOK:
+				Piece.State.ROOK:
 					file_string += "R"
 				_:
 					icon = null

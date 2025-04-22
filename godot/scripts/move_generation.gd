@@ -26,14 +26,14 @@ func _pos_is_none(pos: int) -> bool:
 
 func pawn_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
-	if sign(piece) == Piece.Team.WHITE:
+	if piece & Piece.State.WHITE == Piece.State.WHITE:
 		# Check for attackable squares
 		if _pos_is_enemy_of(piece, pos + 7): moves.append(pos + 7)
 		if _pos_is_enemy_of(piece, pos + 9): moves.append(pos + 9)
 		# Forwards!
 		if _pos_is_none(pos + 8): moves.append(pos + 8)
 		# Double!
-		if _pos_is_none(pos + 16) and !(piece & Piece.HasMoved.TRUE): moves.append(pos + 16)
+		if _pos_is_none(pos + 16) and !(piece & Piece.State.MOVED): moves.append(pos + 16)
 	else:
 		# Check for attackable squares
 		if _pos_is_enemy_of(piece, pos - 7): moves.append(pos - 7)
@@ -41,7 +41,7 @@ func pawn_moves(piece: int, pos: int) -> Array[int]:
 		# Forwards!
 		if _pos_is_none(pos - 8): moves.append(pos - 8)
 		# Double!
-		if _pos_is_none(pos - 16) and !(piece & Piece.HasMoved.TRUE): moves.append(pos - 16)
+		if _pos_is_none(pos - 16) and !(piece & Piece.State.MOVED): moves.append(pos - 16)
 	# En Passant - Holy Hell
 	# Second array access is validated by the first function call
 	#if pos_is_enemy_of(piece, pos + 1) and board[pos + 1].just_double_moved: moves.append(pos + 1)
@@ -64,11 +64,11 @@ func king_moves(piece: int, pos: int) -> Array[int]:
 
 	# Castling?!
 	# Array accesses protected by piece.has_moved in most cases (won't work for other game modes)
-	if piece & Piece.HasMoved.TRUE: return moves
-	if not board[pos - 4] & Piece.HasMoved.TRUE and board[pos - 4] == Piece.Type.ROOK:
+	if piece & Piece.State.MOVED: return moves
+	if not board[pos - 4] & Piece.State.MOVED and board[pos - 4] & 0b111 == Piece.State.ROOK:
 		if board[pos - 1] == 0 and board[pos - 2] == 0 and board[pos - 3] == 0:
 			moves.append(pos - 4)
-	if not board[pos + 3] & Piece.HasMoved.TRUE and board[pos + 3] == Piece.Type.ROOK:
+	if not board[pos + 3] & Piece.State.MOVED and board[pos + 3] & 0b111 == Piece.State.ROOK:
 		if board[pos + 1] == 0 and board[pos + 2] == 0:
 			moves.append(pos + 3)
 	return moves
