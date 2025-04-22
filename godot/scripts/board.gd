@@ -2,7 +2,7 @@ class_name Board
 extends Node2D
 
 ## The chess board
-var main_board: Array[Piece] = []
+var main_board: Array[int] = []
 ## True: White, False: Black
 var turn: bool
 
@@ -26,18 +26,18 @@ func _ready() -> void:
 	board_updated.emit()
 	
 	
-func real_move(board: Array[Piece], src: int, dest: int) -> void:
+func real_move(board: Array[int], src: int, dest: int) -> void:
 	move(board, src, dest)
 	turn = !turn
 
-func move(board: Array[Piece], src: int, dest: int) -> void:
+func move(board: Array[int], src: int, dest: int) -> void:
 	var piece := board[src]
-	if piece.type == Piece.Type.NONE:
+	if piece == Piece.Type.NONE:
 		return;
-	elif piece.type == Piece.Type.PAWN:
+	#elif abs(piece) & 0b111 == Piece.Type.PAWN:
 		# Double move
-		if abs(src - dest) == 16:
-			piece.just_double_moved = true
+		#if abs(src - dest) == 16:
+			#piece.just_double_moved = true
 		# En passant
 		#if abs(src - dest) == 1:
 			#piece.has_moved = true
@@ -45,32 +45,32 @@ func move(board: Array[Piece], src: int, dest: int) -> void:
 			#board[dest + 8] = board[src]
 			#board[src] = Piece.new()
 			#return
-	elif piece.type == Piece.Type.KING:
+	elif abs(piece) & 0b111 == Piece.Type.KING:
 		# Castle kingside
 		if dest - src == 3:
 			board[src + 2] = board[src]
 			board[dest - 2] = board[dest]
-			board[src] = Piece.new()
-			board[dest] = Piece.new()
+			board[src] = 0
+			board[dest] = 0
 		else:
 			board[src - 2] = board[src]
 			board[dest + 3] = board[dest]
-			board[src] = Piece.new()
-			board[dest] = Piece.new()
+			board[src] = 0
+			board[dest] = 0
 	
-	piece.has_moved = true
+	piece |= Piece.HasMoved.TRUE
 	
 	board[dest] = board[src]
-	board[src] = Piece.new()
+	board[src] = 0
 	
 
-func get_moves(board: Array[Piece], pos: int, turn: bool) -> Array[int]:
+func get_moves(board: Array[int], pos: int, turn: bool) -> Array[int]:
 	var piece := board[pos]
 	
-	if not (piece.team == Piece.Team.WHITE) == turn:
+	if not (sign(piece) == Piece.Team.WHITE) == turn:
 		return []
 	
-	match piece.type:
+	match abs(piece) & 0b111:
 		Piece.Type.PAWN:
 			return move_generation.pawn_moves(piece, pos)
 		Piece.Type.KING:

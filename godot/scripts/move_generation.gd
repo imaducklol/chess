@@ -1,38 +1,39 @@
 class_name MoveGeneration
 
-var board: Array[Piece]
+var board: Array[int]
 
-func _init(init_board: Array[Piece]) -> void:
+func _init(init_board: Array[int]) -> void:
 	board = init_board
 
 func _valid_position(pos: int) -> bool:
 	return 0 <= pos and pos <= 63
 
-func _pos_is_enemy_of(piece: Piece, pos: int) -> bool:
+func _pos_is_ally_of(piece: int, pos: int) -> bool:
 	if _valid_position(pos):
-		return piece.is_enemy_of(board[pos])
+		return sign(piece) == sign(board[piece])
 	return false
 
-func _pos_is_ally_of(piece: Piece, pos: int) -> bool:
+func _pos_is_enemy_of(piece: int, pos: int) -> bool:
 	if _valid_position(pos):
-		return piece.is_ally_of(board[pos])
+		if board[pos] == 0 || piece == 0: return false
+		return sign(piece) != sign(board[piece])
 	return false
 
 func _pos_is_none(pos: int) -> bool:
 	if _valid_position(pos):
-		return board[pos].is_none()
+		return board[pos] == 0
 	return false
 
-func pawn_moves(piece: Piece, pos: int) -> Array[int]:
+func pawn_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
-	if piece.team == Piece.Team.WHITE:
+	if sign(piece) == Piece.Team.WHITE:
 		# Check for attackable squares
 		if _pos_is_enemy_of(piece, pos + 7): moves.append(pos + 7)
 		if _pos_is_enemy_of(piece, pos + 9): moves.append(pos + 9)
 		# Forwards!
 		if _pos_is_none(pos + 8): moves.append(pos + 8)
 		# Double!
-		if _pos_is_none(pos + 16) and not piece.has_moved: moves.append(pos + 16)
+		if _pos_is_none(pos + 16) and !(piece & Piece.HasMoved.TRUE): moves.append(pos + 16)
 	else:
 		# Check for attackable squares
 		if _pos_is_enemy_of(piece, pos - 7): moves.append(pos - 7)
@@ -40,14 +41,14 @@ func pawn_moves(piece: Piece, pos: int) -> Array[int]:
 		# Forwards!
 		if _pos_is_none(pos - 8): moves.append(pos - 8)
 		# Double!
-		if _pos_is_none(pos - 16) and not piece.has_moved: moves.append(pos - 16)
+		if _pos_is_none(pos - 16) and !(piece & Piece.HasMoved.TRUE): moves.append(pos - 16)
 	# En Passant - Holy Hell
 	# Second array access is validated by the first function call
 	#if pos_is_enemy_of(piece, pos + 1) and board[pos + 1].just_double_moved: moves.append(pos + 1)
 	#if pos_is_enemy_of(piece, pos - 1) and board[pos - 1].just_double_moved: moves.append(pos - 1)
 	return moves
 
-func king_moves(piece: Piece, pos: int) -> Array[int]:
+func king_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
 	# Unit circle
 	@warning_ignore("integer_division")
@@ -63,16 +64,16 @@ func king_moves(piece: Piece, pos: int) -> Array[int]:
 
 	# Castling?!
 	# Array accesses protected by piece.has_moved in most cases (won't work for other game modes)
-	if piece.has_moved: return moves
-	if not board[pos - 4].has_moved and board[pos - 4].type == Piece.Type.ROOK:
-		if board[pos - 1].type == 0 and board[pos - 2].type == 0 and board[pos - 3].type == 0:
+	if piece & Piece.HasMoved.TRUE: return moves
+	if not board[pos - 4] & Piece.HasMoved.TRUE and board[pos - 4] == Piece.Type.ROOK:
+		if board[pos - 1] == 0 and board[pos - 2] == 0 and board[pos - 3] == 0:
 			moves.append(pos - 4)
-	if not board[pos + 3].has_moved and board[pos + 3].type == Piece.Type.ROOK:
-		if board[pos + 1].type == 0 and board[pos + 2].type == 0:
+	if not board[pos + 3] & Piece.HasMoved.TRUE and board[pos + 3] == Piece.Type.ROOK:
+		if board[pos + 1] == 0 and board[pos + 2] == 0:
 			moves.append(pos + 3)
 	return moves
 
-func _straight_moves(piece: Piece, pos: int) -> Array[int]:
+func _straight_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
 	@warning_ignore("integer_division")
 	var row: int = pos / 8
@@ -113,7 +114,7 @@ func _straight_moves(piece: Piece, pos: int) -> Array[int]:
 		else: break
 	return moves
 
-func _diagonal_moves(piece: Piece, pos: int) -> Array[int]:
+func _diagonal_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
 	@warning_ignore("integer_division")
 	var prev:= Vector2(pos % 8, pos / 8)
@@ -177,16 +178,16 @@ func _diagonal_moves(piece: Piece, pos: int) -> Array[int]:
 		else: break
 	return moves
 
-func queen_moves(piece: Piece, pos: int) -> Array[int]:
+func queen_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
 	moves.append_array(_straight_moves(piece, pos))
 	moves.append_array(_diagonal_moves(piece, pos))
 	return moves
 
-func bishop_moves(piece: Piece, pos: int) -> Array[int]:
+func bishop_moves(piece: int, pos: int) -> Array[int]:
 	return _diagonal_moves(piece, pos)
 
-func knight_moves(piece: Piece, pos: int) -> Array[int]:
+func knight_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
 	for diff: int in [-17, -15, -10, -6, 6, 10, 15, 17]:
 		var dest := pos + diff
@@ -196,5 +197,5 @@ func knight_moves(piece: Piece, pos: int) -> Array[int]:
 		if _valid_position(dest) and not _pos_is_ally_of(piece, dest): moves.append(dest) 
 	return moves
 
-func rook_moves(piece: Piece, pos: int) -> Array[int]:
+func rook_moves(piece: int, pos: int) -> Array[int]:
 	return _straight_moves(piece, pos)

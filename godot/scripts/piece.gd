@@ -15,8 +15,13 @@ enum Type {
 ## Enum for the team of the piece, NONE is used for blank tiles
 enum Team {
 	NONE 	= 0,
-	WHITE 	= 8,
-	BLACK 	= 16,
+	WHITE 	= 1,
+	BLACK 	= -1,
+}
+
+## Enum for whether the piece has moved 
+enum HasMoved {
+	TRUE 	= 8,
 }
 
 var type: Type = Type.NONE

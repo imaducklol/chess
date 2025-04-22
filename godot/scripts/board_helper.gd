@@ -1,11 +1,11 @@
 class_name BoardHelper
 
-func initialize_board(board: Array[Piece]) -> void:
+func initialize_board(board: Array[int]) -> void:
 	for i in range(0, 8):
 		for j in range(0, 8):
-			board.append(Piece.new())
+			board.append(0)
 
-func load_from_fen(board: Array[Piece], turn: bool, fen: String) -> void:
+func load_from_fen(board: Array[int], turn: bool, fen: String) -> void:
 	var segments := fen.split(" ")
 	var rows := segments[0].split("/")
 	for i in range(0, 8):
@@ -13,24 +13,25 @@ func load_from_fen(board: Array[Piece], turn: bool, fen: String) -> void:
 		for letter in rows[i]:
 			if letter.is_valid_int():
 				for k in range(0, int(letter)):
-					board[i*8 + j] = Piece.new()
+					board[i*8 + j] = 0
 					j += 1
 				continue
-			var piece := Piece.new()
-			piece.team = Piece.Team.BLACK if letter == letter.to_upper() else Piece.Team.WHITE
+			var piece := 0
 			match letter.to_lower():
 				"p":
-					piece.type = Piece.Type.PAWN
+					piece = Piece.Type.PAWN
 				"k":
-					piece.type = Piece.Type.KING
+					piece = Piece.Type.KING
 				"q":
-					piece.type = Piece.Type.QUEEN
+					piece = Piece.Type.QUEEN
 				"b":
-					piece.type = Piece.Type.BISHOP
+					piece = Piece.Type.BISHOP
 				"n":
-					piece.type = Piece.Type.KNIGHT
+					piece = Piece.Type.KNIGHT
 				"r":
-					piece.type = Piece.Type.ROOK
+					piece = Piece.Type.ROOK
+			piece *= Piece.Team.BLACK if letter == letter.to_upper() else Piece.Team.WHITE
+			piece |= Piece.HasMoved.TRUE
 			board[i*8 + j] = piece
 			j += 1
 	
