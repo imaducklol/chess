@@ -10,13 +10,13 @@ func _valid_position(pos: int) -> bool:
 
 func _pos_is_ally_of(piece: int, pos: int) -> bool:
 	if _valid_position(pos):
-		return sign(piece) == sign(board[piece])
+		return piece & 0b1000 == board[pos] & 0b1000
 	return false
 
 func _pos_is_enemy_of(piece: int, pos: int) -> bool:
 	if _valid_position(pos):
 		if board[pos] == 0 || piece == 0: return false
-		return sign(piece) != sign(board[piece])
+		return piece & 0b1000 != board[pos] & 0b1000
 	return false
 
 func _pos_is_none(pos: int) -> bool:
@@ -26,7 +26,7 @@ func _pos_is_none(pos: int) -> bool:
 
 func pawn_moves(piece: int, pos: int) -> Array[int]:
 	var moves: Array[int]
-	if piece & Piece.State.WHITE == Piece.State.WHITE:
+	if piece & 0b1000 == Piece.State.WHITE:
 		# Check for attackable squares
 		if _pos_is_enemy_of(piece, pos + 7): moves.append(pos + 7)
 		if _pos_is_enemy_of(piece, pos + 9): moves.append(pos + 9)
@@ -64,6 +64,7 @@ func king_moves(piece: int, pos: int) -> Array[int]:
 
 	# Castling?!
 	# Array accesses protected by piece.has_moved in most cases (won't work for other game modes)
+	# TODO: Make sure team of rook is proper so that other team cant promote new rook
 	if piece & Piece.State.MOVED: return moves
 	if not board[pos - 4] & Piece.State.MOVED and board[pos - 4] & 0b111 == Piece.State.ROOK:
 		if board[pos - 1] == 0 and board[pos - 2] == 0 and board[pos - 3] == 0:

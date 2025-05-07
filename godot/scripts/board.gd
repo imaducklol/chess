@@ -68,9 +68,11 @@ func move(board: Array[int], src: int, dest: int) -> void:
 func get_moves(board: Array[int], pos: int, turn: bool) -> Array[int]:
 	var piece := board[pos]
 	
+	# return no moves if the piece given does not match the turn
 	if not (piece & 0b01000 == Piece.State.WHITE) == turn:
 		return []
 	
+	# mask only the piece bits (last three), and return move for that piece
 	match piece & 0b111:
 		Piece.State.PAWN:
 			return move_generation.pawn_moves(piece, pos)

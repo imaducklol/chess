@@ -1,5 +1,6 @@
 extends Node2D
 
+@export var ai_on: bool
 @export var dark_tile: Color
 @export var light_tile: Color
 @export var board_scale := 70.0:
@@ -55,7 +56,8 @@ func on_button_press(button: ScriptButton) -> void:
 		if pos in selected_piece_moves:
 			GlobalBoard.real_move(GlobalBoard.main_board, selected_piece, pos)
 			clear_highlight_selection()
-			GlobalBoard.minimax.run(Piece.State.WHITE & 0, Minimax.mode.PRUNED, 5)
+			if ai_on:
+				GlobalBoard.minimax.run(Piece.State.WHITE & 0, Minimax.mode.PRUNED, 5)
 			update()
 		else:
 			clear_highlight_selection()
